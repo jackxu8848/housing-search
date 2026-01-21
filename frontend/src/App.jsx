@@ -20,7 +20,8 @@ function App() {
     setFilteredProperties([])
 
     try {
-      const response = await fetch('/api/properties?type=bargain')
+      const apiUrl = import.meta.env.VITE_API_URL || '/api'
+      const response = await fetch(`${apiUrl}/properties?type=bargain`)
       
       if (!response.ok) {
         const errorData = await response.json()
