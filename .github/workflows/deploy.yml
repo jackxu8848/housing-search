@@ -55,6 +55,10 @@ jobs:
           echo "VITE_API_URL is set: $([ -z "$VITE_API_URL" ] && echo 'NO' || echo 'YES')"
           echo "Current directory contents:"
           ls -la
+          echo "Checking index.html specifically:"
+          ls -la index.html || echo "ERROR: index.html not found!"
+          cat index.html | head -5
+          echo "Running build command..."
           npm run build 2>&1 || (echo "Build failed with exit code $?" && exit 1)
           echo "Build completed successfully"
           ls -la dist/
