@@ -20,6 +20,7 @@ function App() {
     setFilteredProperties([])
 
     try {
+      // Use environment variable if set, otherwise use relative path for same-origin
       const apiUrl = import.meta.env.VITE_API_URL || '/api'
       const response = await fetch(`${apiUrl}/properties?type=bargain`)
       
