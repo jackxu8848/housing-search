@@ -33,19 +33,36 @@ jobs:
           cd frontend
           npm ci
 
+      - name: Verify files
+        run: |
+          cd frontend
+          ls -la
+          echo "Checking for index.html..."
+          test -f index.html && echo "✓ index.html exists" || (echo "✗ ERROR: index.html not found" && exit 1)
+          echo "Checking for src directory..."
+          test -d src && echo "✓ src directory exists" || (echo "✗ ERROR: src directory not found" && exit 1)
+          echo "Checking for src/main.jsx..."
+          test -f src/main.jsx && echo "✓ src/main.jsx exists" || (echo "✗ ERROR: src/main.jsx not found" && exit 1)
+
       - name: Build
         run: |
           cd frontend
-          npm run build
+          echo "Building frontend..."
+          echo "VITE_API_URL is set: $([ -z "$VITE_API_URL" ] && echo 'NO' || echo 'YES')"
+          npm run build 2>&1 || (echo "Build failed with exit code $?" && exit 1)
+          echo "Build completed successfully"
+          ls -la dist/
         env:
-          VITE_API_URL: ${{ secrets.VITE_API_URL }}
+          VITE_API_URL: ${{ secrets.VITE_API_URL || '' }}
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
 
       - name: Copy CNAME file
         run: |
-          cp CNAME frontend/dist/CNAME
+          if [ -f CNAME ]; then
+            cp CNAME frontend/dist/CNAME
+          fi
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
