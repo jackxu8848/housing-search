@@ -7,11 +7,20 @@ import { dirname, join } from 'path';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-// Load .env from parent directory (root of project)
-dotenv.config({ path: join(__dirname, '..', '.env') });
+// Load .env from backend directory (for production) or parent directory (for local dev)
+dotenv.config({ path: join(__dirname, '.env') });
+// Fallback to parent directory for local development
+if (!process.env.REPLIERS_API_KEY) {
+  dotenv.config({ path: join(__dirname, '..', '.env') });
+}
 
 const app = express();
 const PORT = process.env.PORT || 3001;
+
+// Health check endpoint
+app.get('/health', (req, res) => {
+  res.json({ status: 'ok', timestamp: new Date().toISOString() });
+});
 
 app.use(cors());
 app.use(express.json());
