@@ -34,6 +34,7 @@ This guide will help you deploy the Smart Real Estate Search application to prod
    - `REPLIERS_API_KEY`: Your Repliers API key
 6. Deploy and copy the URL
 
+npm install; npm run build
 ### Option C: Heroku
 
 1. Install Heroku CLI
