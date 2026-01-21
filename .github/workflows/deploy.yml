@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch:  # Allows manual triggering
 
 permissions:
   contents: read
@@ -29,13 +30,13 @@ jobs:
           cache-dependency-path: frontend/package-lock.json
 
       - name: Install dependencies
-        run: |
-          cd frontend
-          npm ci
+        working-directory: ./frontend
+        run: npm ci
 
       - name: Verify files
+        working-directory: ./frontend
         run: |
-          cd frontend
+          pwd
           ls -la
           echo "Checking for index.html..."
           test -f index.html && echo "✓ index.html exists" || (echo "✗ ERROR: index.html not found" && exit 1)
@@ -43,12 +44,17 @@ jobs:
           test -d src && echo "✓ src directory exists" || (echo "✗ ERROR: src directory not found" && exit 1)
           echo "Checking for src/main.jsx..."
           test -f src/main.jsx && echo "✓ src/main.jsx exists" || (echo "✗ ERROR: src/main.jsx not found" && exit 1)
+          echo "Checking vite.config.js..."
+          test -f vite.config.js && echo "✓ vite.config.js exists" || (echo "✗ ERROR: vite.config.js not found" && exit 1)
 
       - name: Build
+        working-directory: ./frontend
         run: |
-          cd frontend
+          pwd
           echo "Building frontend..."
           echo "VITE_API_URL is set: $([ -z "$VITE_API_URL" ] && echo 'NO' || echo 'YES')"
+          echo "Current directory contents:"
+          ls -la
           npm run build 2>&1 || (echo "Build failed with exit code $?" && exit 1)
           echo "Build completed successfully"
           ls -la dist/
@@ -62,6 +68,9 @@ jobs:
         run: |
           if [ -f CNAME ]; then
             cp CNAME frontend/dist/CNAME
+            echo "✓ CNAME file copied"
+          else
+            echo "⚠ CNAME file not found"
           fi
 
       - name: Upload artifact
@@ -79,4 +88,3 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
-
